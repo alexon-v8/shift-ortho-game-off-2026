@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/interactive/shift_cube.tscn" id="1_cube"]
 [ext_resource type="PackedScene" path="res://scenes/interactive/exit_portal.tscn" id="2_portal"]
@@ -20,6 +20,13 @@ size = Vector3(12, 1, 8)
 [sub_resource type="BoxMesh" id="BoxMesh_plat_high"]
 material = SubResource("StandardMaterial3D_floor")
 size = Vector3(12, 1, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pedestal"]
+size = Vector3(1.6, 0.6, 1.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_pedestal"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector3(1.6, 0.6, 1.6)
 
 [node name="TestChamber1" type="Node3D"]
 
@@ -54,7 +61,10 @@ collision_layer = 1
 collision_mask = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Pedestal"]
-shape = SubResource("BoxShape3D_plat_high")
+shape = SubResource("BoxShape3D_pedestal")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pedestal"]
+mesh = SubResource("BoxMesh_pedestal")
 
 [node name="ShiftCube" parent="." instance=ExtResource("1_cube")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.2, -1)

@@ -36,13 +36,21 @@ func set_ortho_mode(ortho: bool) -> void:
 			SoundManager.instance.play("shift_persp", 1.0, 0.0)
 	mode_changed.emit(is_ortho)
 
-func snap_to_cardinal() -> void:
-	var parent_body = get_parent()
-	if parent_body and parent_body is Node3D:
-		var current_yaw = parent_body.rotation.y
+func snap_to_cardinal(target_body: Node3D = null) -> void:
+	var body: Node3D = target_body
+	if not body:
+		if owner and owner is Node3D:
+			body = owner
+		elif get_parent() and get_parent().get_parent() is Node3D:
+			body = get_parent().get_parent()
+		elif get_parent() is Node3D:
+			body = get_parent()
+
+	if body:
+		var current_yaw = body.rotation.y
 		var step = PI / 4.0 # 45 degrees
 		var snapped_yaw = round(current_yaw / step) * step
-		parent_body.rotation.y = snapped_yaw
+		body.rotation.y = snapped_yaw
 		angle_snapped.emit(rad_to_deg(snapped_yaw))
 		if SoundManager.instance:
 			SoundManager.instance.play("grab", 1.4, -4.0)

@@ -22,8 +22,9 @@ var footstep_timer: float = 0.0
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	spawn_point = global_position
-	camera.mode_changed.connect(_on_camera_mode_changed)
+	spawn_point = global_position if is_inside_tree() else position
+	if camera:
+		camera.mode_changed.connect(_on_camera_mode_changed)
 
 func _input(event: InputEvent):
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
@@ -37,7 +38,7 @@ func _input(event: InputEvent):
 		camera.toggle_projection()
 		
 	if event.is_action_pressed("snap_angle"):
-		camera.snap_to_cardinal()
+		camera.snap_to_cardinal(self)
 
 	if event.is_action_pressed("interact"):
 		_handle_interaction()
@@ -101,6 +102,7 @@ func _physics_process(delta: float):
 func _handle_interaction():
 	if held_cube:
 		# Release held cube
+		interact_raycast.remove_exception(held_cube)
 		held_cube.release(velocity * 0.5)
 		held_cube = null
 		cube_released.emit()
@@ -110,6 +112,7 @@ func _handle_interaction():
 			var collider = interact_raycast.get_collider()
 			if collider is ShiftCube:
 				held_cube = collider
+				interact_raycast.add_exception(held_cube)
 				held_cube.grab(self, camera)
 				cube_grabbed.emit(held_cube)
 
@@ -144,6 +147,7 @@ func respawn():
 	global_position = spawn_point
 	velocity = Vector3.ZERO
 	if held_cube:
+		interact_raycast.remove_exception(held_cube)
 		held_cube.release()
 		held_cube = null
 		cube_released.emit()
